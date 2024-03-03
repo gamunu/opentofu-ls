@@ -21,7 +21,7 @@ func TestHooks_LocalModuleSources(t *testing.T) {
 
 	ctx = decoder.WithPath(ctx, lang.Path{
 		Path:       tmpDir,
-		LanguageID: "terraform",
+		LanguageID: "opentofu",
 	})
 	s, err := state.NewStateStore()
 	if err != nil {

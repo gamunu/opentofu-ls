@@ -686,7 +686,7 @@ func TestModuleStore_UpdateVarsReferenceOrigins(t *testing.T) {
 			},
 			TargetPath: lang.Path{
 				Path:       tmpDir,
-				LanguageID: "terraform",
+				LanguageID: "opentofu",
 			},
 			Constraints: reference.OriginConstraints{
 				reference.OriginConstraint{

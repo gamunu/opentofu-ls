@@ -127,7 +127,7 @@ func TestModuleCompletion_withValidData_basic(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"test\" {\n\n}\n",
 			"uri": "%s/main.tf"
 		}
@@ -320,7 +320,7 @@ func TestModuleCompletion_withValidData_tooOldVersion(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "variable \"test\" {\n\n}\n",
 			"uri": "%s/main.tf"
 		}
@@ -473,7 +473,7 @@ func TestModuleCompletion_withValidData_tooNewVersion(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "variable \"test\" {\n\n}\n",
 			"uri": "%s/main.tf"
 		}
@@ -709,7 +709,7 @@ func TestModuleCompletion_withValidDataAndSnippets(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"test\" {\n\n}\n",
 			"uri": "%s/main.tf"
 		}
@@ -1005,7 +1005,7 @@ func TestVarsCompletion_withValidData(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "variable \"test\" {\n type=string\n}\n",
 			"uri": "%s/variables.tf"
 		}
@@ -1015,7 +1015,7 @@ func TestVarsCompletion_withValidData(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform-vars",
+			"languageId": "opentofu-vars",
 			"uri": "%s/terraform.tfvars"
 		}
 	}`, tmpDir.URI)})
@@ -1160,7 +1160,7 @@ output "test" {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": %q,
 			"uri": "%s/main.tf"
 		}
@@ -1413,7 +1413,7 @@ output "test" {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": %q,
 			"uri": "%s/main.tf"
 		}
@@ -1728,7 +1728,7 @@ variable "ccc" {}
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "output \"test\" {\n  value = var.\n}\n",
 			"uri": "%s/outputs.tf"
 		}

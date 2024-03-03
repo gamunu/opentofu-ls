@@ -56,7 +56,7 @@ func TestFilesystem_ReadFile_memOnly(t *testing.T) {
 		testHandle: &document.Document{
 			Dir:        testHandle.Dir,
 			Filename:   testHandle.Filename,
-			LanguageID: "terraform",
+			LanguageID: "opentofu",
 			Version:    0,
 			Text:       []byte(content),
 		},
@@ -102,7 +102,7 @@ func TestFilesystem_ReadFile_memAndOs(t *testing.T) {
 		testHandle: &document.Document{
 			Dir:        testHandle.Dir,
 			Filename:   testHandle.Filename,
-			LanguageID: "terraform",
+			LanguageID: "opentofu",
 			Version:    0,
 			Text:       []byte(memContent),
 		},
@@ -141,7 +141,7 @@ func TestFilesystem_ReadDir_memAndOs(t *testing.T) {
 		testHandle: &document.Document{
 			Dir:        testHandle.Dir,
 			Filename:   testHandle.Filename,
-			LanguageID: "terraform",
+			LanguageID: "opentofu",
 			Version:    0,
 			Text:       []byte("test"),
 		},
@@ -167,7 +167,7 @@ func TestFilesystem_ReadDir_memFsOnly(t *testing.T) {
 		testHandle: &document.Document{
 			Dir:        testHandle.Dir,
 			Filename:   testHandle.Filename,
-			LanguageID: "terraform",
+			LanguageID: "opentofu",
 			Version:    0,
 			Text:       []byte("test"),
 		},
@@ -227,7 +227,7 @@ func TestFilesystem_Open_memOnly(t *testing.T) {
 		testHandle: &document.Document{
 			Dir:        testHandle.Dir,
 			Filename:   testHandle.Filename,
-			LanguageID: "terraform",
+			LanguageID: "opentofu",
 			Version:    0,
 			Text:       []byte("test"),
 		},
@@ -272,7 +272,7 @@ func TestFilesystem_Open_memAndOs(t *testing.T) {
 		testHandle: &document.Document{
 			Dir:        testHandle.Dir,
 			Filename:   testHandle.Filename,
-			LanguageID: "terraform",
+			LanguageID: "opentofu",
 			Version:    0,
 			Text:       []byte(memContent),
 		},

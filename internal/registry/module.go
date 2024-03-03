@@ -16,9 +16,6 @@ import (
 	"github.com/hashicorp/go-version"
 	tfaddr "github.com/hashicorp/terraform-registry-address"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type ModuleResponse struct {
@@ -67,8 +64,6 @@ func (rce ClientError) Error() string {
 }
 
 func (c Client) GetModuleData(ctx context.Context, addr tfaddr.Module, cons version.Constraints) (*ModuleResponse, error) {
-	ctx, span := otel.Tracer(tracerName).Start(ctx, "registry:GetModuleData")
-	defer span.End()
 	var response ModuleResponse
 
 	v, err := c.GetMatchingModuleVersion(ctx, addr, cons)
@@ -113,8 +108,6 @@ func (c Client) GetModuleData(ctx context.Context, addr tfaddr.Module, cons vers
 }
 
 func (c Client) GetMatchingModuleVersion(ctx context.Context, addr tfaddr.Module, con version.Constraints) (*version.Version, error) {
-	ctx, span := otel.Tracer(tracerName).Start(ctx, "registry:GetMatchingModuleVersion")
-	defer span.End()
 	foundVersions, err := c.GetModuleVersions(ctx, addr)
 	if err != nil {
 		return nil, err
@@ -130,9 +123,6 @@ func (c Client) GetMatchingModuleVersion(ctx context.Context, addr tfaddr.Module
 }
 
 func (c Client) GetModuleVersions(ctx context.Context, addr tfaddr.Module) (version.Collection, error) {
-	ctx, span := otel.Tracer(tracerName).Start(ctx, "registry:GetModuleVersions")
-	defer span.End()
-
 	url := fmt.Sprintf("%s/v1/modules/%s/%s/%s/versions", c.BaseURL,
 		addr.Package.Namespace,
 		addr.Package.Name,
@@ -160,13 +150,11 @@ func (c Client) GetModuleVersions(ctx context.Context, addr tfaddr.Module) (vers
 		return nil, ClientError{StatusCode: resp.StatusCode, Body: string(bodyBytes)}
 	}
 
-	_, decodeSpan := otel.Tracer(tracerName).Start(ctx, "registry:GetModuleVersions:decodeJson")
 	var response ModuleVersionsResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
 		return nil, err
 	}
-	decodeSpan.End()
 
 	var foundVersions version.Collection
 	for _, module := range response.Modules {
@@ -177,11 +165,6 @@ func (c Client) GetModuleVersions(ctx context.Context, addr tfaddr.Module) (vers
 			}
 		}
 	}
-	span.AddEvent("registry:foundModuleVersions",
-		trace.WithAttributes(attribute.KeyValue{
-			Key:   attribute.Key("moduleVersionCount"),
-			Value: attribute.IntValue(len(foundVersions)),
-		}))
 
 	sort.Sort(sort.Reverse(foundVersions))
 

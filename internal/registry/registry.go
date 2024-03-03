@@ -8,13 +8,11 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-cleanhttp"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 const (
-	defaultBaseURL = "https://registry.terraform.io"
+	defaultBaseURL = "https://registry.opentofu.org"
 	defaultTimeout = 5 * time.Second
-	tracerName     = "github.com/hashicorp/terraform-ls/internal/registry"
 )
 
 type Client struct {
@@ -27,7 +25,6 @@ type Client struct {
 func NewClient() Client {
 	client := cleanhttp.DefaultClient()
 	client.Timeout = defaultTimeout
-	client.Transport = otelhttp.NewTransport(client.Transport)
 
 	return Client{
 		BaseURL:          defaultBaseURL,

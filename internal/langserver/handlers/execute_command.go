@@ -20,13 +20,13 @@ func cmdHandlers(svc *service) cmd.Handlers {
 		Logger:     svc.logger,
 	}
 	return cmd.Handlers{
-		cmd.Name("rootmodules"):        removedHandler("use module.callers instead"),
-		cmd.Name("module.callers"):     cmdHandler.ModuleCallersHandler,
-		cmd.Name("terraform.init"):     cmdHandler.TerraformInitHandler,
-		cmd.Name("terraform.validate"): cmdHandler.TerraformValidateHandler,
-		cmd.Name("module.calls"):       cmdHandler.ModuleCallsHandler,
-		cmd.Name("module.providers"):   cmdHandler.ModuleProvidersHandler,
-		cmd.Name("module.terraform"):   cmdHandler.TerraformVersionRequestHandler,
+		cmd.Name("rootmodules"):      removedHandler("use module.callers instead"),
+		cmd.Name("module.callers"):   cmdHandler.ModuleCallersHandler,
+		cmd.Name("tofu.init"):        cmdHandler.TerraformInitHandler,
+		cmd.Name("tofu.validate"):    cmdHandler.TerraformValidateHandler,
+		cmd.Name("module.calls"):     cmdHandler.ModuleCallsHandler,
+		cmd.Name("module.providers"): cmdHandler.ModuleProvidersHandler,
+		cmd.Name("module.terraform"): cmdHandler.TerraformVersionRequestHandler,
 	}
 }
 

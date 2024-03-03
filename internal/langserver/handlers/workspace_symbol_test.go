@@ -68,7 +68,7 @@ func TestLangServer_workspace_symbol_basic(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"github\" {}",
 			"uri": "%s/first.tf"
 		}
@@ -78,7 +78,7 @@ func TestLangServer_workspace_symbol_basic(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"google\" {}",
 			"uri": "%s/second.tf"
 		}
@@ -88,7 +88,7 @@ func TestLangServer_workspace_symbol_basic(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "myblock \"custom\" {}",
 			"uri": "%s/blah/third.tf"
 		}
@@ -206,7 +206,7 @@ func TestLangServer_workspace_symbol_missing(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"github\" {}",
 			"uri": "%s/first.tf"
 		}
@@ -216,7 +216,7 @@ func TestLangServer_workspace_symbol_missing(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"google\" {}",
 			"uri": "%s/second.tf"
 		}
@@ -226,7 +226,7 @@ func TestLangServer_workspace_symbol_missing(t *testing.T) {
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "myblock \"custom\" {}",
 			"uri": "%s/blah/third.tf"
 		}

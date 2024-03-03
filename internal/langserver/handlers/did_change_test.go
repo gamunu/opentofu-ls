@@ -69,7 +69,7 @@ module "app" {
 		Method: "textDocument/didOpen",
 		ReqParams: fmt.Sprintf(`{
     "textDocument": {
-        "languageId": "terraform",
+        "languageId": "opentofu",
         "version": 0,
         "uri": "%s/main.tf",
         "text": %q

@@ -55,7 +55,7 @@ func TestLangServer_workspaceExecuteCommand_validate_argumentError(t *testing.T)
 		ReqParams: fmt.Sprintf(`{
 		"textDocument": {
 			"version": 0,
-			"languageId": "terraform",
+			"languageId": "opentofu",
 			"text": "provider \"github\" {}",
 			"uri": %q
 		}
@@ -66,5 +66,5 @@ func TestLangServer_workspaceExecuteCommand_validate_argumentError(t *testing.T)
 		Method: "workspace/executeCommand",
 		ReqParams: fmt.Sprintf(`{
 		"command": %q
-	}`, cmd.Name("terraform.validate"))}, jrpc2.InvalidParams.Err())
+	}`, cmd.Name("tofu.validate"))}, jrpc2.InvalidParams.Err())
 }

@@ -11,7 +11,7 @@ import (
 
 const (
 	// SourceFormatAllTerraform is a Terraform specific format code action.
-	SourceFormatAllTerraform = "source.formatAll.terraform"
+	SourceFormatAllTerraform = "source.formatAll.opentofu"
 )
 
 type CodeActions map[lsp.CodeActionKind]bool
@@ -31,7 +31,7 @@ var (
 
 	// `source.formatAll`: Generic format code action.
 	// We do not register this for terraform to allow fine grained selection of actions.
-	// A user should be able to set `source.formatAll` to true, and source.formatAll.terraform to false to allow all
+	// A user should be able to set `source.formatAll` to true, and source.formatAll.opentofu to false to allow all
 	// files to be formatted, but not terraform files (or vice versa).
 	SupportedCodeActions = CodeActions{
 		SourceFormatAllTerraform: true,

@@ -13,7 +13,7 @@ import (
 func TerraformExecutorForModule(ctx context.Context, modPath string) (exec.TerraformExecutor, error) {
 	newExecutor, ok := exec.ExecutorFactoryFromContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("no terraform executor provided")
+		return nil, fmt.Errorf("no opentofu executor provided")
 	}
 
 	execPath, err := TerraformExecPath(ctx)
