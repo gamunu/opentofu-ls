@@ -34,7 +34,6 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/scheduler"
 	"github.com/hashicorp/terraform-ls/internal/settings"
 	"github.com/hashicorp/terraform-ls/internal/state"
-	"github.com/hashicorp/terraform-ls/internal/telemetry"
 	"github.com/hashicorp/terraform-ls/internal/terraform/discovery"
 	"github.com/hashicorp/terraform-ls/internal/terraform/exec"
 	"github.com/hashicorp/terraform-ls/internal/walker"
@@ -71,7 +70,6 @@ type service struct {
 	tfDiscoFunc    discovery.DiscoveryFunc
 	tfExecFactory  exec.ExecutorFactory
 	tfExecOpts     *exec.ExecutorOpts
-	telemetry      telemetry.Sender
 	decoder        *decoder.Decoder
 	stateStore     *state.StateStore
 	server         session.Server
@@ -101,7 +99,6 @@ func NewSession(srvCtx context.Context) session.Session {
 		stopSession:    stopSession,
 		tfDiscoFunc:    d.LookPath,
 		tfExecFactory:  exec.NewExecutor,
-		telemetry:      &telemetry.NoopSender{},
 		registryClient: registry.NewClient(),
 	}
 }
@@ -121,8 +118,6 @@ func (svc *service) Assigner() (jrpc2.Assigner, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to prepare session: %w", err)
 	}
-
-	svc.telemetry = &telemetry.NoopSender{Logger: svc.logger}
 
 	cc := &lsp.ClientCapabilities{}
 
@@ -481,6 +476,8 @@ func (svc *service) configureSessionDependencies(ctx context.Context, cfgOpts *s
 
 	svc.stateStore.SetLogger(svc.logger)
 
+	moduleHooks := []notifier.Hook{}
+
 	svc.lowPrioIndexer = scheduler.NewScheduler(svc.stateStore.JobStore, 1, job.LowPriority)
 	svc.lowPrioIndexer.SetLogger(svc.logger)
 	svc.lowPrioIndexer.Start(svc.sessCtx)
@@ -563,11 +560,6 @@ func (svc *service) configureSessionDependencies(ctx context.Context, cfgOpts *s
 	svc.features.Modules.AppendCompletionHooks(svc.srvCtx, decoderContext)
 	svc.decoder.SetContext(decoderContext)
 
-	moduleHooks := []notifier.Hook{
-		updateDiagnostics(svc.features, svc.diagsNotifier),
-		sendModuleTelemetry(svc.features, svc.telemetry),
-	}
-
 	cc, err := ilsp.ClientCapabilities(ctx)
 	if err == nil {
 		if _, ok := lsp.ExperimentalClientCapabilities(cc.Experimental).ShowReferencesCommandId(); ok {
@@ -595,16 +587,6 @@ func (svc *service) configureSessionDependencies(ctx context.Context, cfgOpts *s
 	svc.notifier.SetLogger(svc.logger)
 	svc.notifier.Start(svc.sessCtx)
 
-	return nil
-}
-
-func (svc *service) setupTelemetry(version int, notifier session.ClientNotifier) error {
-	t, err := telemetry.NewSender(version, notifier)
-	if err != nil {
-		return err
-	}
-
-	svc.telemetry = t
 	return nil
 }
 

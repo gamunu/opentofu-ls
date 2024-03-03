@@ -32,16 +32,10 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 		return serverCaps, err
 	}
 
-	properties := getTelemetryProperties(out)
-	properties["lsVersion"] = serverCaps.ServerInfo.Version
-
 	clientCaps := params.Capabilities
 	expClientCaps := lsp.ExperimentalClientCapabilities(clientCaps.Experimental)
 
 	svc.server = jrpc2.ServerFromContext(ctx)
-
-	setupTelemetry(expClientCaps, svc, ctx, properties)
-	defer svc.telemetry.SendEvent(ctx, "initialize", properties)
 
 	if params.ClientInfo.Name != "" {
 		err = ilsp.SetClientName(ctx, params.ClientInfo.Name)
@@ -54,19 +48,15 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 
 	if _, ok := expClientCaps.ShowReferencesCommandId(); ok {
 		expServerCaps.ReferenceCountCodeLens = true
-		properties["experimentalCapabilities.referenceCountCodeLens"] = true
 	}
 	if _, ok := expClientCaps.RefreshModuleProvidersCommandId(); ok {
 		expServerCaps.RefreshModuleProviders = true
-		properties["experimentalCapabilities.refreshModuleProviders"] = true
 	}
 	if _, ok := expClientCaps.RefreshModuleCallsCommandId(); ok {
 		expServerCaps.RefreshModuleCalls = true
-		properties["experimentalCapabilities.refreshModuleCalls"] = true
 	}
 	if _, ok := expClientCaps.RefreshTerraformVersionCommandId(); ok {
 		expServerCaps.RefreshTerraformVersion = true
-		properties["experimentalCapabilities.refreshTerraformVersion"] = true
 	}
 
 	serverCaps.Capabilities.Experimental = expServerCaps
@@ -128,13 +118,6 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 
 	if params.RootURI == "" {
 		svc.singleFileMode = true
-		properties["root_uri"] = "file"
-		if properties["options.ignoreSingleFileWarning"] == false {
-			jrpc2.ServerFromContext(ctx).Notify(ctx, "window/showMessage", &lsp.ShowMessageParams{
-				Type:    lsp.Warning,
-				Message: "Some capabilities may be reduced when editing a single file. We recommend opening a directory for full functionality. Use 'ignoreSingleFileWarning' to suppress this warning.",
-			})
-		}
 	} else {
 		rootURI := string(params.RootURI)
 
@@ -143,7 +126,6 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 				"This is most likely client bug, please report it.", rootURI)
 
 		if uri.IsWSLURI(rootURI) {
-			properties["root_uri"] = "invalid"
 			// For WSL URIs we return additional error data
 			// such that clients (e.g. VS Code) can provide better UX
 			// and nudge users to open in the WSL Remote Extension instead.
@@ -151,8 +133,6 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 		}
 
 		if !uri.IsURIValid(rootURI) {
-			properties["root_uri"] = "invalid"
-
 			return serverCaps, invalidUriErr
 		}
 
@@ -178,51 +158,6 @@ func (svc *service) Initialize(ctx context.Context, params lsp.InitializeParams)
 	}
 
 	return serverCaps, err
-}
-
-func setupTelemetry(expClientCaps lsp.ExpClientCapabilities, svc *service, _ context.Context, _ map[string]interface{}) {
-	if tv, ok := expClientCaps.TelemetryVersion(); ok {
-		svc.logger.Printf("enabling telemetry (version: %d)", tv)
-		err := svc.setupTelemetry(tv, svc.server)
-		if err != nil {
-			svc.logger.Printf("failed to setup telemetry: %s", err)
-		}
-		svc.logger.Printf("telemetry enabled (version: %d)", tv)
-	}
-}
-
-func getTelemetryProperties(out *settings.DecodedOptions) map[string]interface{} {
-	properties := map[string]interface{}{
-		"experimentalCapabilities.referenceCountCodeLens": false,
-		"options.ignoreSingleFileWarning":                 false,
-		"options.rootModulePaths":                         false,
-		"options.excludeModulePaths":                      false,
-		"options.commandPrefix":                           false,
-		"options.indexing.ignoreDirectoryNames":           false,
-		"options.indexing.ignorePaths":                    false,
-		"options.experimentalFeatures.validateOnSave":     false,
-		"options.terraform.path":                          false,
-		"options.terraform.timeout":                       "",
-		"options.terraform.logFilePath":                   false,
-		"options.validation.earlyValidation":              false,
-		"root_uri":                                        "dir",
-		"lsVersion":                                       "",
-	}
-
-	properties["options.rootModulePaths"] = len(out.Options.XLegacyModulePaths) > 0
-	properties["options.excludeModulePaths"] = len(out.Options.XLegacyExcludeModulePaths) > 0
-	properties["options.commandPrefix"] = len(out.Options.CommandPrefix) > 0
-	properties["options.indexing.ignoreDirectoryNames"] = len(out.Options.Indexing.IgnoreDirectoryNames) > 0
-	properties["options.indexing.ignorePaths"] = len(out.Options.Indexing.IgnorePaths) > 0
-	properties["options.experimentalFeatures.prefillRequiredFields"] = out.Options.ExperimentalFeatures.PrefillRequiredFields
-	properties["options.experimentalFeatures.validateOnSave"] = out.Options.ExperimentalFeatures.ValidateOnSave
-	properties["options.ignoreSingleFileWarning"] = out.Options.IgnoreSingleFileWarning
-	properties["options.terraform.path"] = len(out.Options.Terraform.Path) > 0
-	properties["options.terraform.timeout"] = out.Options.Terraform.Timeout
-	properties["options.terraform.logFilePath"] = len(out.Options.Terraform.LogFilePath) > 0
-	properties["options.validation.earlyValidation"] = out.Options.Validation.EnableEnhancedValidation
-
-	return properties
 }
 
 func initializeResult(ctx context.Context) lsp.InitializeResult {
