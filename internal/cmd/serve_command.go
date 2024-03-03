@@ -14,7 +14,6 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/hashicorp/terraform-ls/internal/algolia"
 	lsctx "github.com/hashicorp/terraform-ls/internal/context"
 	"github.com/hashicorp/terraform-ls/internal/langserver"
 	"github.com/hashicorp/terraform-ls/internal/langserver/handlers"
@@ -30,9 +29,6 @@ import (
 type ServeCommand struct {
 	Ui      cli.Ui
 	Version string
-
-	AlgoliaAppID  string
-	AlgoliaAPIKey string
 
 	// flags
 	port           int
@@ -108,9 +104,6 @@ func (c *ServeCommand) Run(args []string) int {
 	logger.Printf("Starting terraform-ls %s", c.Version)
 
 	ctx = lsctx.WithLanguageServerVersion(ctx, c.Version)
-	if c.AlgoliaAppID != "" && c.AlgoliaAPIKey != "" {
-		ctx = algolia.WithCredentials(ctx, c.AlgoliaAppID, c.AlgoliaAPIKey)
-	}
 
 	var err error
 	shutdownFunc := func(context.Context) error { return nil }
