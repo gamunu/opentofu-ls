@@ -1,7 +1,6 @@
 name: Release
 
 on:
-  pull_request:
   push:
     # run only against tags
     tags:
@@ -31,6 +30,6 @@ jobs:
       - uses: goreleaser/goreleaser-action@v5          # run goreleaser
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
