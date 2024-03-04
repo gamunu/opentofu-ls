@@ -3,4 +3,4 @@
 
 package discovery
 
-const executableName = "terraform.exe"
+const executableName = "tofu.exe"
