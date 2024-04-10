@@ -1,14 +1,10 @@
 name: test
-
 on:
   pull_request:
   push:
-    branches:
-      - main
-
+    branches: [main]
 env:
   GOPROXY: https://proxy.golang.org/
-
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -16,17 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Set up Go
         uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
         with:
-          go-version-file: ".go-version"
+          go-version-file: .go-version
       - name: Go mod download
         run: go mod download -x
       - name: Go mod verify
