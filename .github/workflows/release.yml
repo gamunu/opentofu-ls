@@ -1,35 +1,56 @@
-name: Release
-
+name: release
 on:
   push:
     # run only against tags
-    tags:
-      - "*"
-
+    tags: ['*']
 jobs:
+  generate-provider-schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout directory
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
+        with:
+          go-version-file: .go-version
+      - name: Generate provider schemas
+        run: |
+          go generate ./internal/schemas
+          du -h -s ./internal/schemas/data
+      - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: provider-schema-data
+          path: ./internal/schemas/data
+          retention-days: 1
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # this is important, otherwise it won't checkout the full tree (i.e. no previous tags)
-
       - uses: actions/setup-go@v5
         with:
-          go-version: stable
-
+          go-version-file: .go-version
       - uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-
-      - uses: sigstore/cosign-installer@v3.4.0         # installs cosign
-
-      - uses: goreleaser/goreleaser-action@v5          # run goreleaser
+      - uses: sigstore/cosign-installer@v3.4.0 # installs cosign
+      - uses: goreleaser/goreleaser-action@v5 # run goreleaser
         with:
           version: latest
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  delete-provider-schemas:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: geekyeggo/delete-artifact@24928e75e6e6590170563b8ddae9fac674508aa1 # v5.0.0
+        with:
+          name: provider-schema-data
+          token: ${{ github.token }}
