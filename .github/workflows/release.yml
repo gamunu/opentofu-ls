@@ -25,6 +25,7 @@ jobs:
           path: ./internal/schemas/data
           retention-days: 1
   release:
+    needs: generate-provider-schemas
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
