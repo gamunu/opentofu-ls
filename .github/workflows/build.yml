@@ -1,4 +1,3 @@
----
 name: build
 on:
   push:
@@ -55,3 +54,10 @@ jobs:
             -trimpath \
             -buildvcs=false \
             -ldflags "-s -w"
+  delete-provider-schemas:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: geekyeggo/delete-artifact@24928e75e6e6590170563b8ddae9fac674508aa1 # v5.0.0
+        with:
+          name: provider-schema-data
