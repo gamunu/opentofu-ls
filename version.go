@@ -4,7 +4,9 @@
 package main
 
 var (
-	version = "0.1.0"
+	version = "0.1.0-dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 // VersionString returns the complete version string, including prerelease
