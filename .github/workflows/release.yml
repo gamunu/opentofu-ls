@@ -1,3 +1,4 @@
+---
 name: release
 on:
   push:
@@ -24,8 +25,10 @@ jobs:
           name: provider-schema-data
           path: ./internal/schemas/data
           retention-days: 1
+
   release:
     runs-on: ubuntu-latest
+    needs: generate-provider-schemas
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,6 +49,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   delete-provider-schemas:
     needs: release
     runs-on: ubuntu-latest
