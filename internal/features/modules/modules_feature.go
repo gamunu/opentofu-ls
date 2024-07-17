@@ -9,11 +9,9 @@ import (
 	"io"
 	"log"
 
-	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl-lang/decoder"
 	"github.com/hashicorp/hcl-lang/lang"
-	"github.com/hashicorp/terraform-ls/internal/algolia"
 	"github.com/hashicorp/terraform-ls/internal/document"
 	"github.com/hashicorp/terraform-ls/internal/eventbus"
 	fdecoder "github.com/hashicorp/terraform-ls/internal/features/modules/decoder"
@@ -23,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/langserver/diagnostics"
 	"github.com/hashicorp/terraform-ls/internal/registry"
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
-	"github.com/hashicorp/terraform-ls/internal/telemetry"
 	"github.com/hashicorp/terraform-schema/backend"
 	tfmod "github.com/hashicorp/terraform-schema/module"
 )
@@ -170,11 +167,6 @@ func (f *ModulesFeature) AppendCompletionHooks(srvCtx context.Context, decoderCo
 		Logger:         f.logger,
 	}
 
-	credentials, ok := algolia.CredentialsFromContext(srvCtx)
-	if ok {
-		h.AlgoliaClient = search.NewClient(credentials.AppID, credentials.APIKey)
-	}
-
 	decoderContext.CompletionHooks["CompleteLocalModuleSources"] = h.LocalModuleSources
 	decoderContext.CompletionHooks["CompleteRegistryModuleSources"] = h.RegistryModuleSources
 	decoderContext.CompletionHooks["CompleteRegistryModuleVersions"] = h.RegistryModuleVersions
@@ -247,11 +239,6 @@ func (f *ModulesFeature) Telemetry(path string) map[string]interface{} {
 	if len(mod.Meta.ProviderRequirements) > 0 {
 		reqs := make(map[string]string, 0)
 		for pAddr, cons := range mod.Meta.ProviderRequirements {
-			if telemetry.IsPublicProvider(pAddr) {
-				reqs[pAddr.String()] = cons.String()
-				continue
-			}
-
 			// anonymize any unknown providers or the ones not publicly listed
 			id, err := f.stateStore.ProviderSchemas.GetProviderID(pAddr)
 			if err != nil {
