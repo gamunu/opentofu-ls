@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/state"
 )
 
-
 func callRefreshClientCommand(clientRequester session.ClientCaller, commandId string) notifier.Hook {
 	return func(ctx context.Context, changes state.Changes) error {
 		// TODO: avoid triggering if module calls/providers did not change
