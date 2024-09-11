@@ -1,0 +1,6 @@
+kind: ENHANCEMENTS
+body: use opentofu schema and opentofu registry libraries
+time: 2024-09-11T21:21:22.4141+05:30
+custom:
+    Issue: "17"
+    Repository: terraform-ls
