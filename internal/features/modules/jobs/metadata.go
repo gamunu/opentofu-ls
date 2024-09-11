@@ -6,14 +6,14 @@ package jobs
 import (
 	"context"
 
+	"github.com/gamunu/opentofu-schema/earlydecoder"
+	tfmodule "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-ls/internal/document"
 	"github.com/hashicorp/terraform-ls/internal/features/modules/state"
 	"github.com/hashicorp/terraform-ls/internal/job"
 	op "github.com/hashicorp/terraform-ls/internal/terraform/module/operation"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform-schema/earlydecoder"
-	tfmodule "github.com/hashicorp/terraform-schema/module"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 // LoadModuleMetadata loads data about the module in a version-independent

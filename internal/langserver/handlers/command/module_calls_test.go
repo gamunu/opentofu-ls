@@ -7,10 +7,10 @@ import (
 	"context"
 	"testing"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	tfmod "github.com/hashicorp/terraform-schema/module"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 func Test_parseModuleRecords(t *testing.T) {

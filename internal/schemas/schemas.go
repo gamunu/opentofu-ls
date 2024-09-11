@@ -13,7 +13,7 @@ import (
 	"path"
 
 	"github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 //go:embed data

@@ -7,10 +7,10 @@ import (
 	"errors"
 	"testing"
 
+	tfschema "github.com/gamunu/opentofu-schema/schema"
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	tfschema "github.com/hashicorp/terraform-schema/schema"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 func TestStateStore_AddPreloadedSchema_duplicate(t *testing.T) {

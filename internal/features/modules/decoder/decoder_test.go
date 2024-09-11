@@ -16,6 +16,7 @@ import (
 	"testing"
 	"testing/fstest"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl-lang/decoder"
 	"github.com/hashicorp/hcl-lang/lang"
@@ -24,7 +25,6 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/features/modules/jobs"
 	"github.com/hashicorp/terraform-ls/internal/features/modules/state"
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
-	tfmod "github.com/hashicorp/terraform-schema/module"
 )
 
 type RootReaderMock struct{}

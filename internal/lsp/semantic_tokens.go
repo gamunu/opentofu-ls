@@ -4,10 +4,10 @@
 package lsp
 
 import (
+	tfschema "github.com/gamunu/opentofu-schema/schema"
 	"github.com/hashicorp/hcl-lang/lang"
 	"github.com/hashicorp/terraform-ls/internal/lsp/semtok"
 	lsp "github.com/hashicorp/terraform-ls/internal/protocol"
-	tfschema "github.com/hashicorp/terraform-schema/schema"
 )
 
 // Registering types which are actually in use

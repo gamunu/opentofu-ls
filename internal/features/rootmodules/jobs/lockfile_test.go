@@ -19,7 +19,7 @@ import (
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
 	"github.com/hashicorp/terraform-ls/internal/terraform/exec"
 	"github.com/hashicorp/terraform-ls/internal/terraform/module/operation"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/opentofu/registry-address"
 	"github.com/stretchr/testify/mock"
 	"github.com/zclconf/go-cty/cty"
 )

@@ -8,14 +8,14 @@ import (
 	"io"
 	"log"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-ls/internal/eventbus"
 	"github.com/hashicorp/terraform-ls/internal/features/rootmodules/jobs"
 	"github.com/hashicorp/terraform-ls/internal/features/rootmodules/state"
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
 	"github.com/hashicorp/terraform-ls/internal/terraform/exec"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	tfmod "github.com/hashicorp/terraform-schema/module"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 // RootModulesFeature groups everything related to root modules. Its internal

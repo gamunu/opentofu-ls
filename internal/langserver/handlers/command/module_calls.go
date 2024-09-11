@@ -10,10 +10,10 @@ import (
 	"strings"
 
 	"github.com/creachadair/jrpc2"
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/terraform-ls/internal/langserver/cmd"
 	"github.com/hashicorp/terraform-ls/internal/uri"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	tfmod "github.com/hashicorp/terraform-schema/module"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 const moduleCallsVersion = 0

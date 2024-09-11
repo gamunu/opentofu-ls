@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-ls/internal/pathcmp"
-	tfmod "github.com/hashicorp/terraform-schema/module"
 )
 
 var manifestPathElements = []string{

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl/v2"
@@ -15,7 +16,6 @@ import (
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
 	"github.com/hashicorp/terraform-ls/internal/terraform/datadir"
 	"github.com/hashicorp/terraform-ls/internal/terraform/module/operation"
-	tfmod "github.com/hashicorp/terraform-schema/module"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 )
 

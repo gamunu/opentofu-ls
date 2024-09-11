@@ -6,15 +6,15 @@ package decoder
 import (
 	"context"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
+	"github.com/gamunu/opentofu-schema/registry"
+	tfschema "github.com/gamunu/opentofu-schema/schema"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl-lang/decoder"
 	"github.com/hashicorp/hcl-lang/lang"
 	"github.com/hashicorp/terraform-ls/internal/features/modules/state"
 	ilsp "github.com/hashicorp/terraform-ls/internal/lsp"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	tfmod "github.com/hashicorp/terraform-schema/module"
-	"github.com/hashicorp/terraform-schema/registry"
-	tfschema "github.com/hashicorp/terraform-schema/schema"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 type StateReader interface {

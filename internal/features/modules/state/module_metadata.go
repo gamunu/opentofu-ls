@@ -4,10 +4,10 @@
 package state
 
 import (
+	"github.com/gamunu/opentofu-schema/backend"
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform-schema/backend"
-	tfmod "github.com/hashicorp/terraform-schema/module"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 // ModuleMetadata contains the result of the early decoding of a module,

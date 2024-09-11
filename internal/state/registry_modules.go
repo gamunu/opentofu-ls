@@ -6,9 +6,9 @@ package state
 import (
 	"fmt"
 
+	"github.com/gamunu/opentofu-schema/registry"
 	"github.com/hashicorp/go-version"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	"github.com/hashicorp/terraform-schema/registry"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 type RegistryModuleData struct {

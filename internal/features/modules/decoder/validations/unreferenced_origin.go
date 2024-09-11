@@ -25,7 +25,7 @@ func UnreferencedOrigins(ctx context.Context, pathCtx *decoder.PathContext) lang
 			// DirectOrigin is represented as module's source
 			// and we already validate existence of the local module
 			// and avoiding linking to a non-existent module in terraform-schema
-			// https://github.com/hashicorp/terraform-schema/blob/b39f3de0/schema/module_schema.go#L212-L232
+			// https://github.com/gamunu/opentofu-schema/blob/b39f3de0/schema/module_schema.go#L212-L232
 			//
 			// PathOrigin is represented as module inputs
 			// and we can validate module inputs more meaningfully

@@ -9,6 +9,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/gamunu/opentofu-schema/backend"
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl-lang/decoder"
 	"github.com/hashicorp/hcl-lang/lang"
@@ -21,8 +23,6 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/langserver/diagnostics"
 	"github.com/hashicorp/terraform-ls/internal/registry"
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
-	"github.com/hashicorp/terraform-schema/backend"
-	tfmod "github.com/hashicorp/terraform-schema/module"
 )
 
 // ModulesFeature groups everything related to modules. Its internal

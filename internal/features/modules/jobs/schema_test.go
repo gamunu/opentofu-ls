@@ -19,6 +19,7 @@ import (
 	"testing/fstest"
 	"time"
 
+	tfregistry "github.com/gamunu/opentofu-schema/registry"
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl-lang/lang"
@@ -29,8 +30,7 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/job"
 	"github.com/hashicorp/terraform-ls/internal/registry"
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
-	tfregistry "github.com/hashicorp/terraform-schema/registry"
+	tfaddr "github.com/opentofu/registry-address"
 	"github.com/zclconf/go-cty-debug/ctydebug"
 	"github.com/zclconf/go-cty/cty"
 )

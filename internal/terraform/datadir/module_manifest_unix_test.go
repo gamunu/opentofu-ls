@@ -10,9 +10,9 @@ import (
 	"encoding/json"
 	"testing"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/go-version"
-	tfmod "github.com/hashicorp/terraform-schema/module"
 )
 
 func TestRecord_UnmarshalJSON_basic(t *testing.T) {

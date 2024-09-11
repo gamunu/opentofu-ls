@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	stackschema "github.com/gamunu/opentofu-schema/schema"
 	"github.com/hashicorp/hcl-lang/decoder"
 	"github.com/hashicorp/hcl-lang/lang"
 	"github.com/hashicorp/hcl-lang/reference"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-ls/internal/features/stacks/ast"
 	"github.com/hashicorp/terraform-ls/internal/features/stacks/state"
 	ilsp "github.com/hashicorp/terraform-ls/internal/lsp"
-	stackschema "github.com/hashicorp/terraform-schema/schema"
 )
 
 type PathReader struct {

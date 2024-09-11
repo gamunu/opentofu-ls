@@ -4,9 +4,9 @@
 package jobs
 
 import (
+	tfregistry "github.com/gamunu/opentofu-schema/registry"
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hcl-lang/lang"
-	tfregistry "github.com/hashicorp/terraform-schema/registry"
 	"github.com/zclconf/go-cty/cty"
 )
 

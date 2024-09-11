@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	tfmod "github.com/gamunu/opentofu-schema/module"
 	"github.com/hashicorp/go-version"
 	lsctx "github.com/hashicorp/terraform-ls/internal/context"
 	"github.com/hashicorp/terraform-ls/internal/features/modules/state"
@@ -15,7 +16,6 @@ import (
 	ilsp "github.com/hashicorp/terraform-ls/internal/lsp"
 	globalState "github.com/hashicorp/terraform-ls/internal/state"
 	"github.com/hashicorp/terraform-ls/internal/terraform/ast"
-	tfmod "github.com/hashicorp/terraform-schema/module"
 )
 
 type RootReaderMock struct{}

@@ -10,7 +10,7 @@ import (
 	"github.com/creachadair/jrpc2"
 	"github.com/hashicorp/terraform-ls/internal/langserver/cmd"
 	"github.com/hashicorp/terraform-ls/internal/uri"
-	tfaddr "github.com/hashicorp/terraform-registry-address"
+	tfaddr "github.com/opentofu/registry-address"
 )
 
 const moduleProvidersVersion = 0
