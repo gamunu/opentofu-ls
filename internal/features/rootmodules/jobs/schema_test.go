@@ -713,12 +713,9 @@ func TestStateStore_ListSchemas(t *testing.T) {
 			},
 			Schema: &tfschema.ProviderSchema{
 				Provider: &schema.BodySchema{
-					Detail:   "hashicorp/aws-local 0.9.0",
-					HoverURL: "https://registry.terraform.io/providers/hashicorp/aws-local/0.9.0/docs",
-					DocsLink: &schema.DocsLink{
-						URL:     "https://registry.terraform.io/providers/hashicorp/aws-local/0.9.0/docs",
-						Tooltip: "hashicorp/aws-local Documentation",
-					},
+					Detail:     "hashicorp/aws-local 0.9.0",
+					HoverURL:   "",
+					DocsLink:   nil,
 					Attributes: map[string]*schema.AttributeSchema{},
 					Blocks:     map[string]*schema.BlockSchema{},
 				},
@@ -736,12 +733,9 @@ func TestStateStore_ListSchemas(t *testing.T) {
 			},
 			Schema: &tfschema.ProviderSchema{
 				Provider: &schema.BodySchema{
-					Detail:   "hashicorp/aws-local 1.0.0",
-					HoverURL: "https://registry.terraform.io/providers/hashicorp/aws-local/1.0.0/docs",
-					DocsLink: &schema.DocsLink{
-						URL:     "https://registry.terraform.io/providers/hashicorp/aws-local/1.0.0/docs",
-						Tooltip: "hashicorp/aws-local Documentation",
-					},
+					Detail:     "hashicorp/aws-local 1.0.0",
+					HoverURL:   "",
+					DocsLink:   nil,
 					Attributes: map[string]*schema.AttributeSchema{},
 					Blocks:     map[string]*schema.BlockSchema{},
 				},
@@ -759,12 +753,9 @@ func TestStateStore_ListSchemas(t *testing.T) {
 			},
 			Schema: &tfschema.ProviderSchema{
 				Provider: &schema.BodySchema{
-					Detail:   "hashicorp/aws-local 1.3.0",
-					HoverURL: "https://registry.terraform.io/providers/hashicorp/aws-local/1.3.0/docs",
-					DocsLink: &schema.DocsLink{
-						URL:     "https://registry.terraform.io/providers/hashicorp/aws-local/1.3.0/docs",
-						Tooltip: "hashicorp/aws-local Documentation",
-					},
+					Detail:     "hashicorp/aws-local 1.3.0",
+					HoverURL:   "",
+					DocsLink:   nil,
 					Attributes: map[string]*schema.AttributeSchema{},
 					Blocks:     map[string]*schema.BlockSchema{},
 				},
@@ -782,19 +773,16 @@ func TestStateStore_ListSchemas(t *testing.T) {
 			},
 			Schema: &tfschema.ProviderSchema{
 				Provider: &schema.BodySchema{
-					Detail:   "hashicorp/blah 1.0.0",
-					HoverURL: "https://registry.terraform.io/providers/hashicorp/blah/1.0.0/docs",
-					DocsLink: &schema.DocsLink{
-						URL:     "https://registry.terraform.io/providers/hashicorp/blah/1.0.0/docs",
-						Tooltip: "hashicorp/blah Documentation",
-					},
+					Detail:     "hashicorp/blah 1.0.0",
+					HoverURL:   "",
+					DocsLink:   nil,
 					Attributes: map[string]*schema.AttributeSchema{},
 					Blocks:     map[string]*schema.BlockSchema{},
 				},
 			},
 		},
 	}
-	if diff := cmp.Diff(expectedSchemas, schemas, cmpOpts); diff != "" {
+	if diff := cmp.Diff(schemas, expectedSchemas, cmpOpts); diff != "" {
 		t.Fatalf("unexpected schemas: %s", diff)
 	}
 }

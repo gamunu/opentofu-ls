@@ -1,3 +1,5 @@
+// Copyright (c) Gamunu Balagalla.
+// SPDX-License-Identifier: MPL-2.0
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
@@ -16,7 +18,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 	"syscall"
@@ -24,10 +25,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-version"
-	hcinstall "github.com/hashicorp/hc-install"
-	"github.com/hashicorp/hc-install/product"
-	"github.com/hashicorp/hc-install/releases"
-	"github.com/hashicorp/hc-install/src"
 	"github.com/hashicorp/terraform-exec/tfexec"
 	tfjson "github.com/hashicorp/terraform-json"
 	lsctx "github.com/hashicorp/terraform-ls/internal/context"
@@ -38,8 +35,8 @@ import (
 var terraformVersion = version.MustConstraints(version.NewConstraint("~> 1.0"))
 
 type Provider struct {
-	ID   string
-	Addr tfaddr.Provider
+	Addr    tfaddr.Provider
+	Version string
 }
 
 func main() {
@@ -61,71 +58,42 @@ func gen() error {
 
 	providers := make([]Provider, 0)
 	providers = append(providers, Provider{
-		ID:   "0",
-		Addr: tfaddr.NewProvider(tfaddr.BuiltInProviderHost, tfaddr.BuiltInProviderNamespace, "terraform"),
+		Addr: tfaddr.NewProvider(tfaddr.BuiltInProviderHost, tfaddr.BuiltInProviderNamespace, "opentofu"),
 	})
 
-	// obtain all official & partner providers from the Registry
+	// obtain all providers from the OpenTofu Registry
 	client := registry.NewClient()
-	log.Println("fetching official providers from registry")
-	officialProviders, err := client.ListProviders("official")
+	log.Println("fetching providers from registry")
+	registryProviders, err := client.ListProviders()
 	if err != nil {
 		return err
 	}
-	log.Printf("fetched official providers: %d", len(officialProviders))
-	for _, p := range officialProviders {
-		if p.Attributes.Namespace == "hashicorp" && p.Attributes.Name == "terraform" {
-			// skip the old terraform provider as this is now built-in
+	log.Printf("fetched providers: %d", len(registryProviders))
+	for _, p := range registryProviders {
+		if len(p.Versions) == 0 {
+			log.Printf("skipping %s/%s: no versions available", p.Addr.Namespace, p.Addr.Name)
 			continue
 		}
+		latestVersion := p.Versions[0].ID // Use the first version as it's the latest
 		providers = append(providers, Provider{
-			ID: p.ID,
 			Addr: tfaddr.NewProvider(
 				tfaddr.DefaultProviderRegistryHost,
-				p.Attributes.Namespace,
-				p.Attributes.Name,
+				p.Addr.Namespace,
+				p.Addr.Name,
 			),
-		})
-	}
-	log.Println("fetching verified partner providers from registry")
-	partnerProviders, err := client.ListProviders("partner")
-	if err != nil {
-		return err
-	}
-	log.Printf("fetched partner providers: %d", len(partnerProviders))
-	for _, p := range partnerProviders {
-		providers = append(providers, Provider{
-			ID: p.ID,
-			Addr: tfaddr.NewProvider(
-				tfaddr.DefaultProviderRegistryHost,
-				p.Attributes.Namespace,
-				p.Attributes.Name,
-			),
+			Version: latestVersion,
 		})
 	}
 
-	// find or install Terraform
-	log.Println("ensuring terraform is installed")
+	// find or install opentofu
+	log.Println("ensuring tofu is installed")
 	installDir, err := ioutil.TempDir("", "hcinstall")
 	if err != nil {
 		return err
 	}
 	defer os.RemoveAll(installDir)
-	i := hcinstall.NewInstaller()
-	execPath, err := i.Ensure(ctx, []src.Source{
-		&releases.LatestVersion{
-			Product:     product.Terraform,
-			InstallDir:  installDir,
-			Constraints: terraformVersion,
-		},
-	})
-	if err != nil {
-		return err
-	}
-	defer i.Remove(ctx)
-
 	// log version
-	tf, err := tfexec.NewTerraform(installDir, execPath)
+	tf, err := tfexec.NewTerraform(installDir, "tofu")
 	if err != nil {
 		return err
 	}
@@ -133,7 +101,7 @@ func gen() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("using Terraform %s (%s)", coreVersion, execPath)
+	log.Printf("using tofu %s (%s)", coreVersion, "tofu")
 
 	workspacePath, err := filepath.Abs("gen-workspace")
 	if err != nil {
@@ -172,14 +140,14 @@ func gen() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Terraform plugin cache will be stored at %s", cacheDirPath)
+	log.Printf("Tofu plugin cache will be stored at %s", cacheDirPath)
 
 	// install each provider and obtain schema for it
 	providerChan := make(chan Inputs)
 	go func() {
 		for _, p := range providers {
 			providerChan <- Inputs{
-				TerraformExecPath: execPath,
+				TerraformExecPath: "tofu",
 				WorkspacePath:     workspacePath,
 				DataDirPath:       dataDirPath,
 				CacheDirPath:      cacheDirPath,
@@ -191,7 +159,7 @@ func gen() error {
 	}()
 
 	var workerWg sync.WaitGroup
-	workerCount := runtime.NumCPU()
+	workerCount := 1 //runtime.NumCPU()
 	log.Printf("worker count: %d", workerCount)
 	workerWg.Add(workerCount)
 	for i := 1; i <= workerCount; i++ {
@@ -205,7 +173,7 @@ func gen() error {
 					continue
 				}
 
-				log.Printf("%s: obtained schema for %s (%db raw / %db compressed); terraform init: %s",
+				log.Printf("%s: obtained schema for %s (%db raw / %db compressed); tofu init: %s",
 					input.Provider.Addr.ForDisplay(), details.Version,
 					details.RawSize, details.CompressedSize, details.InitElapsedTime)
 			}
@@ -232,23 +200,16 @@ type Outputs struct {
 	InitElapsedTime time.Duration
 }
 
+// In the schemaForProvider function, replace the GetLatestProviderVersion call:
 func schemaForProvider(ctx context.Context, client registry.Client, input Inputs) (*Outputs, error) {
 	var pVersion *version.Version
 	if input.Provider.Addr.IsBuiltIn() {
 		pVersion = input.CoreVersion
 	} else {
-		resp, err := client.GetLatestProviderVersion(input.Provider.ID)
+		var err error
+		pVersion, err = version.NewVersion(input.Provider.Version)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get latest version: %w", err)
-		}
-
-		pVersion, err = version.NewVersion(resp.Data.Attributes.Version)
-		if err != nil {
-			return nil, fmt.Errorf("invalid version %q: %w", resp.Data.Attributes.Version, err)
-		}
-
-		if !providerVersionSupportsOsAndArch(resp.Included, runtime.GOOS, runtime.GOARCH) {
-			return nil, fmt.Errorf("version %s does not support %s/%s", pVersion, runtime.GOOS, runtime.GOARCH)
+			return nil, fmt.Errorf("invalid version %q: %w", input.Provider.Version, err)
 		}
 	}
 
@@ -300,7 +261,7 @@ func schemaForProvider(ctx context.Context, client registry.Client, input Inputs
 
 	err = tmpl.Execute(configFile, templateData{
 		TerraformVersion: terraformVersion.String(),
-		LocalName:        "provider" + input.Provider.ID,
+		LocalName:        "provider",
 		Source:           input.Provider.Addr.ForDisplay(),
 		Version:          pVersion.String(),
 	})
@@ -314,25 +275,14 @@ func schemaForProvider(ctx context.Context, client registry.Client, input Inputs
 		return nil, err
 	}
 
-	// See https://github.com/hashicorp/terraform-exec/issues/337
-	// Terraform would refuse to init any provider otherwise
-	// and some providers refuse to give schemas or break
-	// the gRPC protocol for some mysterious reason
-	env := make(map[string]string, 0)
+	env := make(map[string]string)
 	for _, rawKeyPair := range os.Environ() {
-		parts := strings.Split(rawKeyPair, "=")
-		if parts[0] == "" {
-			// For unknown reasons on Windows there can be some odd variables
-			// such as "=::=::\\", "=C:=C:\\path" or "=ExitCode=00000000"
-			// which we ignore here
+		parts := strings.SplitN(rawKeyPair, "=", 2)
+		if len(parts) != 2 || parts[0] == "" {
 			continue
 		}
-		env[parts[0]] = os.Getenv(parts[0])
+		env[parts[0]] = parts[1]
 	}
-	// This is to help keep paths short, esp. on Windows
-	// (260 characters by default)
-	// See https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#maximum-path-length-limitation
-	// and also to avoid embedding the provider binaries
 	env["TF_PLUGIN_CACHE_DIR"] = input.CacheDirPath
 
 	tf.SetEnv(env)
@@ -358,7 +308,6 @@ func schemaForProvider(ctx context.Context, client registry.Client, input Inputs
 		}
 	}
 
-	// TODO upstream change to have tfexec write to file directly instead of unmarshal/remarshal
 	ps, err := retryProviderSchema(ctx, tf, input.Provider.Addr.ForDisplay(), 0)
 	if err != nil {
 		return nil, err
@@ -471,15 +420,4 @@ func initErrorIsRetryable(err error) (string, bool) {
 		return "503 Service Unavailable", true
 	}
 	return "", false
-}
-
-func providerVersionSupportsOsAndArch(includes []registry.Included, os, arch string) bool {
-	for _, inc := range includes {
-		if inc.Type == "provider-platforms" &&
-			inc.Attributes.Os == os &&
-			inc.Attributes.Arch == arch {
-			return true
-		}
-	}
-	return false
 }

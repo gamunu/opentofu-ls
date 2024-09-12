@@ -1,4 +1,4 @@
-// Copyright (c) HashiCorp, Inc.
+// Copyright (c) Gamunu Balagalla.
 // SPDX-License-Identifier: MPL-2.0
 
 package registry
@@ -8,108 +8,61 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
-type pagination struct {
-	NextPage int `json:"next-page"`
+type ProviderList struct {
+	Providers []Provider `json:"providers"`
 }
 
-type meta struct {
-	Pagination pagination `json:"pagination"`
+type Provider struct {
+	Addr               ProviderAddr      `json:"addr"`
+	BlockedReason      string            `json:"blocked_reason"`
+	CanonicalAddr      ProviderAddr      `json:"canonical_addr"`
+	Description        string            `json:"description"`
+	ForkCount          int               `json:"fork_count"`
+	ForkOf             *ProviderAddr     `json:"fork_of,omitempty"`
+	ForkOfLink         string            `json:"fork_of_link"`
+	IsBlocked          bool              `json:"is_blocked"`
+	Popularity         int               `json:"popularity"`
+	ReverseAliases     []ProviderAddr    `json:"reverse_aliases"`
+	UpstreamForkCount  int               `json:"upstream_fork_count"`
+	UpstreamPopularity int               `json:"upstream_popularity"`
+	Versions           []ProviderVersion `json:"versions"`
 }
 
-type registryResponse struct {
-	Data []Provider `json:"data"`
-	Meta meta       `json:"meta"`
-}
-
-type ProviderAttributes struct {
+type ProviderAddr struct {
+	Display   string `json:"display"`
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 }
 
-type Provider struct {
-	ID         string             `json:"id"`
-	Attributes ProviderAttributes `json:"attributes"`
+type ProviderVersion struct {
+	ID        string    `json:"id"`
+	Published time.Time `json:"published"`
 }
 
-func (c Client) ListProviders(tier string) ([]Provider, error) {
-	var providers []Provider
-	page := 1
-	for page > 0 {
-		url := fmt.Sprintf("%s/v2/providers?page[size]=%d&filter[tier]=%s&page[number]=%d",
-			c.BaseURL, c.ProviderPageSize, tier, page)
-		resp, err := http.Get(url)
-		if err != nil {
-			return nil, err
-		}
-
-		if resp.StatusCode != 200 {
-			bodyBytes, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return nil, err
-			}
-			defer resp.Body.Close()
-			return nil, fmt.Errorf("unexpected response: %s: %s", resp.Status, string(bodyBytes))
-		}
-
-		var response registryResponse
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		if err != nil {
-			return nil, fmt.Errorf("unable to decode response: %w", err)
-		}
-		providers = append(providers, response.Data...)
-		page = response.Meta.Pagination.NextPage
-	}
-	return providers, nil
-}
-
-type ProviderVersionResponse struct {
-	Data     ProviderVersionData `json:"data"`
-	Included []Included          `json:"included"`
-}
-
-type Included struct {
-	Type       string             `json:"type"`
-	Attributes IncludedAttributes `json:"attributes"`
-}
-
-type IncludedAttributes struct {
-	Arch string `json:"arch"`
-	Os   string `json:"os"`
-}
-
-type ProviderVersionData struct {
-	Attributes ProviderVersionAttributes `json:"attributes"`
-}
-
-type ProviderVersionAttributes struct {
-	Version string `json:"version"`
-}
-
-func (c Client) GetLatestProviderVersion(id string) (*ProviderVersionResponse, error) {
-	url := fmt.Sprintf("%s/v2/providers/%s/provider-versions/latest?include=provider-platforms",
-		c.BaseURL, id)
+func (c Client) ListProviders() ([]Provider, error) {
+	url := fmt.Sprintf("%s/providers/index.json", c.BaseURL)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Body.Close()
-
-		return nil, fmt.Errorf("unexpected response %s: %s", resp.Status, string(bodyBytes))
+		return nil, fmt.Errorf("unexpected response: %s: %s", resp.Status, string(bodyBytes))
 	}
 
-	var response ProviderVersionResponse
+	var response ProviderList
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to decode response: %w", err)
 	}
 
-	return &response, nil
+	return response.Providers, nil
 }

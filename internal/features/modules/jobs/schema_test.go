@@ -478,11 +478,11 @@ func TestPreloadEmbeddedSchema_basic(t *testing.T) {
 	dataDir := "data"
 	schemasFS := fstest.MapFS{
 		dataDir:                            &fstest.MapFile{Mode: fs.ModeDir},
-		dataDir + "/registry.terraform.io": &fstest.MapFile{Mode: fs.ModeDir},
-		dataDir + "/registry.terraform.io/hashicorp":              &fstest.MapFile{Mode: fs.ModeDir},
-		dataDir + "/registry.terraform.io/hashicorp/random":       &fstest.MapFile{Mode: fs.ModeDir},
-		dataDir + "/registry.terraform.io/hashicorp/random/1.0.0": &fstest.MapFile{Mode: fs.ModeDir},
-		dataDir + "/registry.terraform.io/hashicorp/random/1.0.0/schema.json.gz": &fstest.MapFile{
+		dataDir + "/registry.opentofu.org": &fstest.MapFile{Mode: fs.ModeDir},
+		dataDir + "/registry.opentofu.org/hashicorp":              &fstest.MapFile{Mode: fs.ModeDir},
+		dataDir + "/registry.opentofu.org/hashicorp/random":       &fstest.MapFile{Mode: fs.ModeDir},
+		dataDir + "/registry.opentofu.org/hashicorp/random/1.0.0": &fstest.MapFile{Mode: fs.ModeDir},
+		dataDir + "/registry.opentofu.org/hashicorp/random/1.0.0/schema.json.gz": &fstest.MapFile{
 			Data: gzipCompressBytes(t, []byte(randomSchemaJSON)),
 		},
 	}

@@ -64,7 +64,7 @@ func Test_parseModuleRecords(t *testing.T) {
 					SourceAddr:       "terraform-aws-modules/ec2-instance/aws",
 					Version:          "2.12.0",
 					SourceType:       "tfregistry",
-					DocsLink:         "https://registry.terraform.io/modules/terraform-aws-modules/ec2-instance/aws/latest?utm_content=workspace%2FexecuteCommand%2Fmodule.calls&utm_source=terraform-ls",
+					DocsLink:         "",
 					DependentModules: []moduleCall{},
 				},
 				{
@@ -72,7 +72,7 @@ func Test_parseModuleRecords(t *testing.T) {
 					SourceAddr:       "terraform-aws-modules/eks/aws",
 					Version:          "17.20.0",
 					SourceType:       "tfregistry",
-					DocsLink:         "https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest?utm_content=workspace%2FexecuteCommand%2Fmodule.calls&utm_source=terraform-ls",
+					DocsLink:         "",
 					DependentModules: []moduleCall{},
 				},
 				{
@@ -112,7 +112,7 @@ func Test_parseModuleRecords_v1_1(t *testing.T) {
 				Declared: map[string]tfmod.DeclaredModuleCall{
 					"ec2_instances": {
 						LocalName:  "ec2_instances",
-						SourceAddr: tfaddr.MustParseModuleSource("registry.terraform.io/terraform-aws-modules/ec2-instance/aws"),
+						SourceAddr: tfaddr.MustParseModuleSource("registry.opentofu.org/terraform-aws-modules/ec2-instance/aws"),
 						Version:    version.MustConstraints(version.NewConstraint("2.12.0")),
 					},
 				},
@@ -123,7 +123,7 @@ func Test_parseModuleRecords_v1_1(t *testing.T) {
 					SourceAddr:       "terraform-aws-modules/ec2-instance/aws",
 					Version:          "2.12.0",
 					SourceType:       "tfregistry",
-					DocsLink:         "https://registry.terraform.io/modules/terraform-aws-modules/ec2-instance/aws/latest?utm_content=workspace%2FexecuteCommand%2Fmodule.calls&utm_source=terraform-ls",
+					DocsLink:         "",
 					DependentModules: []moduleCall{},
 				},
 			},
