@@ -1,272 +1,207 @@
-// Copyright (c) HashiCorp, Inc.
+// Copyright (c) Gamunu Balagalla.
 // SPDX-License-Identifier: MPL-2.0
 
 package registry
 
-// moduleVersionsMockResponse represents response from https://registry.terraform.io/v1/modules/puppetlabs/deployment/ec/versions
 var moduleVersionsMockResponse = `{
-  "modules": [
+  "id": "v0.8.1",
+  "published": "2024-08-05T17:16:42+01:00",
+  "readme": true,
+  "edit_link": "https://github.com/azure/terraform-azurerm-alz/blob/v0.8.1/README.md",
+  "variables": {
+    "architecture_name": {
+      "type": "string",
+      "default": null,
+      "description": "The name of the architecture to create. This needs to be*.alz_architecture_definition.[json|yaml|yml] files.\n",
+      "sensitive": false,
+      "required": true
+    }, 
+    "location": {
+      "type": "string",
+      "default": null,
+      "description": "The default location for resources in this management group. Used for policy managed identities.\n",
+      "sensitive": false,
+      "required": true
+    }
+  },
+  "outputs": {
+    "management_group_resource_ids": {
+      "sensitive": false,
+      "description": "A map of management group names to their resource ids."
+    },
+    "policy_assignment_resource_ids": {
+      "sensitive": false,
+      "description": "A map of policy assignment names to their resource ids."
+    }
+  },
+  "schema_error": "",
+  "providers": [],
+  "dependencies": [
     {
-      "source": "puppetlabs/deployment/ec",
-      "versions": [
+      "name": "policy_assignment",
+      "version_constraint": "",
+      "source": "./modules/azapi_helper"
+    },
+    {
+      "name": "policy_definitions",
+      "version_constraint": "",
+      "source": "./modules/azapi_helper"
+    }  
+  ],
+  "resources": [
+    {
+      "address": "modtm_telemetry.telemetry",
+      "type": "modtm_telemetry",
+      "name": "telemetry"
+    },
+    {
+      "address": "random_uuid.telemetry",
+      "type": "random_uuid",
+      "name": "telemetry"
+    }  
+  ],
+  "link": "https://github.com/azure/terraform-azurerm-alz/tree/v0.8.1",
+  "vcs_repository": "",
+  "licenses": [
+    {
+      "spdx": "MIT",
+      "confidence": 1,
+      "is_compatible": true,
+      "file": "LICENSE",
+      "link": "https://github.com/azure/terraform-azurerm-alz/blob/v0.8.1/LICENSE"
+    }
+  ],
+  "incompatible_license": false,
+  "examples": {
+    "default": {
+      "readme": true,
+      "edit_link": "https://github.com/azure/terraform-azurerm-alz/blob/v0.8.1/examples/default/README.md",
+      "variables": {},
+      "outputs": {},
+      "schema_error": ""
+    },
+    "policy-assignment-modification-with-custom-lib": {
+      "readme": true,
+      "edit_link": "https://github.com/azure/terraform-azurerm-alz/blob/v0.8.1/examples/policy-assignment-modification-with-custom-lib/README.md",
+      "variables": {},
+      "outputs": {},
+      "schema_error": ""
+    }
+  },
+  "submodules": {
+    "azapi_helper": {
+      "readme": true,
+      "edit_link": "https://github.com/azure/terraform-azurerm-alz/blob/v0.8.1/modules/azapi_helper/README.md",
+      "variables": {
+        "body": {
+          "type": "dynamic",
+          "default": null,
+          "description": "The body object of the resource.",
+          "sensitive": false,
+          "required": true
+        },
+        "name": {
+          "type": "string",
+          "default": null,
+          "description": "The name of resource.",
+          "sensitive": false,
+          "required": true
+        }
+      },
+      "outputs": {
+        "identity": {
+          "sensitive": false,
+          "description": "The identity configuration of the resource."
+        },
+        "name": {
+          "sensitive": false,
+          "description": "The name of the resource."
+        }
+      },
+      "schema_error": "",
+      "providers": [],
+      "dependencies": [],
+      "resources": [
         {
-          "version": "0.0.5",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
+          "address": "azapi_resource.this",
+          "type": "azapi_resource",
+          "name": "this"
         },
         {
-          "version": "0.0.6",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
-        },
-        {
-          "version": "0.0.8",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
-        },
-        {
-          "version": "0.0.2",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
-        },
-        {
-          "version": "0.0.1",
-          "root": {
-            "providers": [],
-            "dependencies": []
-          },
-          "submodules": [
-            {
-              "path": "modules/ec-deployment",
-              "providers": [
-                {
-                  "name": "ec",
-                  "namespace": "",
-                  "source": "elastic/ec",
-                  "version": "0.2.1"
-                }
-              ],
-              "dependencies": []
-            }
-          ]
-        },
-        {
-          "version": "0.0.4",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
-        },
-        {
-          "version": "0.0.3",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
-        },
-        {
-          "version": "0.0.7",
-          "root": {
-            "providers": [
-              {
-                "name": "ec",
-                "namespace": "",
-                "source": "elastic/ec",
-                "version": "0.2.1"
-              }
-            ],
-            "dependencies": []
-          },
-          "submodules": []
+          "address": "terraform_data.replace_trigger",
+          "type": "terraform_data",
+          "name": "replace_trigger"
         }
       ]
     }
-  ]
+  }
 }`
 
-// moduleDataMockResponse represents response from https://registry.terraform.io/v1/modules/puppetlabs/deployment/ec/0.0.8
 var moduleDataMockResponse = `{
-  "id": "puppetlabs/deployment/ec/0.0.8",
-  "owner": "mattkirby",
-  "namespace": "puppetlabs",
-  "name": "deployment",
-  "version": "0.0.8",
-  "provider": "ec",
-  "provider_logo_url": "/images/providers/generic.svg?2",
-  "description": "",
-  "source": "https://github.com/puppetlabs/terraform-ec-deployment",
-  "tag": "v0.0.8",
-  "published_at": "2021-08-05T00:26:33.501756Z",
-  "downloads": 3059237,
-  "verified": false,
-  "root": {
-    "path": "",
-    "name": "deployment",
-    "readme": "# EC project Terraform module\n\nTerraform module which creates a Elastic Cloud project.\n\n## Usage\n\nDetails coming soon\n",
-    "empty": false,
-    "inputs": [
-      {
-        "name": "autoscale",
-        "type": "string",
-        "description": "Enable autoscaling of elasticsearch",
-        "default": "\"true\"",
-        "required": false
-      },
-      {
-        "name": "ec_stack_version",
-        "type": "string",
-        "description": "Version of Elastic Cloud stack to deploy",
-        "default": "\"\"",
-        "required": false
-      },
-      {
-        "name": "name",
-        "type": "string",
-        "description": "Name of resources",
-        "default": "\"ecproject\"",
-        "required": false
-      },
-      {
-        "name": "traffic_filter_sourceip",
-        "type": "string",
-        "description": "traffic filter source IP",
-        "default": "\"\"",
-        "required": false
-      },
-      {
-        "name": "ec_region",
-        "type": "string",
-        "description": "cloud provider region",
-        "default": "\"gcp-us-west1\"",
-        "required": false
-      },
-      {
-        "name": "deployment_templateid",
-        "type": "string",
-        "description": "ID of Elastic Cloud deployment type",
-        "default": "\"gcp-io-optimized\"",
-        "required": false
-      }
-    ],
-    "outputs": [
-      {
-        "name": "elasticsearch_password",
-        "description": "elasticsearch password"
-      },
-      {
-        "name": "deployment_id",
-        "description": "Elastic Cloud deployment ID"
-      },
-      {
-        "name": "elasticsearch_version",
-        "description": "Stack version deployed"
-      },
-      {
-        "name": "elasticsearch_cloud_id",
-        "description": "Elastic Cloud project deployment ID"
-      },
-      {
-        "name": "elasticsearch_https_endpoint",
-        "description": "elasticsearch https endpoint"
-      },
-      {
-        "name": "elasticsearch_username",
-        "description": "elasticsearch username"
-      }
-    ],
-    "dependencies": [],
-    "provider_dependencies": [
-      {
-        "name": "ec",
-        "namespace": "elastic",
-        "source": "elastic/ec",
-        "version": "0.2.1"
-      }
-    ],
-    "resources": [
-      {
-        "name": "ecproject",
-        "type": "ec_deployment"
-      },
-      {
-        "name": "gcp_vpc_nat",
-        "type": "ec_deployment_traffic_filter"
-      },
-      {
-        "name": "ec_tf_association",
-        "type": "ec_deployment_traffic_filter_association"
-      }
-    ]
+  "addr": {
+    "display": "azure/alz/azurerm",
+    "namespace": "azure",
+    "name": "alz",
+    "target": "azurerm"
   },
-  "submodules": [],
-  "examples": [],
-  "providers": [
-    "ec"
-  ],
+  "description": "Terraform module to deploy Azure Landing Zones",
   "versions": [
-    "0.0.1",
-    "0.0.2",
-    "0.0.3",
-    "0.0.4",
-    "0.0.5",
-    "0.0.6",
-    "0.0.7",
-    "0.0.8"
-  ]
+    {
+      "id": "v0.8.1",
+      "published": "2024-08-05T17:16:42+01:00"
+    },
+    {
+      "id": "v0.8.0",
+      "published": "2024-07-10T16:41:49+01:00"
+    },
+    {
+      "id": "v0.7.0",
+      "published": "2024-07-08T17:55:56+01:00"
+    },
+    {
+      "id": "v0.6.0",
+      "published": "2024-03-13T12:31:59Z"
+    },
+    {
+      "id": "v0.5.0",
+      "published": "2024-03-08T10:29:31Z"
+    },
+    {
+      "id": "v0.4.1",
+      "published": "2023-11-06T21:35:38Z"
+    },
+    {
+      "id": "v0.4.0",
+      "published": "2023-11-06T21:26:06Z"
+    },
+    {
+      "id": "v0.3.3",
+      "published": "2023-11-02T17:22:57Z"
+    },
+    {
+      "id": "v0.3.2",
+      "published": "2023-11-02T10:44:07Z"
+    },
+    {
+      "id": "v0.3.1",
+      "published": "2023-10-26T14:08:19+01:00"
+    },
+    {
+      "id": "v0.3.0",
+      "published": "2023-10-09T20:19:28+01:00"
+    },
+    {
+      "id": "v0.2.0",
+      "published": "2023-10-06T16:56:28+01:00"
+    },
+    {
+      "id": "v0.1.1",
+      "published": "2023-08-08T17:26:02+01:00"
+    },
+    {
+      "id": "v0.1.0",
+      "published": "2023-08-08T15:43:59+01:00"
+    }
+  ],
+  "is_blocked": false
 }`

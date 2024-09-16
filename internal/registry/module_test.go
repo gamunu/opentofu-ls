@@ -1,3 +1,5 @@
+// Copyright (c) Gamunu Balagalla.
+// SPDX-License-Identifier: MPL-2.0
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
@@ -19,25 +21,24 @@ import (
 
 func TestGetModuleData(t *testing.T) {
 	ctx := context.Background()
-	addr, err := tfaddr.ParseModuleSource("puppetlabs/deployment/ec")
+	addr, err := tfaddr.ParseModuleSource("azure/alz/azurerm")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cons := version.MustConstraints(version.NewConstraint("0.0.8"))
+	cons := version.MustConstraints(version.NewConstraint("0.8.1"))
 
 	client := NewClient()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI == "/v1/modules/puppetlabs/deployment/ec/versions" {
-			w.Write([]byte(moduleVersionsMockResponse))
-			return
-		}
-		if r.RequestURI == "/v1/modules/puppetlabs/deployment/ec/0.0.8" {
+		switch r.RequestURI {
+		case "/modules/azure/alz/azurerm/index.json":
 			w.Write([]byte(moduleDataMockResponse))
-			return
+		case "/modules/azure/alz/azurerm/v0.8.1/index.json":
+			w.Write([]byte(moduleVersionsMockResponse))
+		default:
+			http.Error(w, fmt.Sprintf("unexpected request: %q", r.RequestURI), 400)
 		}
-		http.Error(w, fmt.Sprintf("unexpected request: %q", r.RequestURI), 400)
 	}))
 	client.BaseURL = srv.URL
 	t.Cleanup(srv.Close)
@@ -46,82 +47,103 @@ func TestGetModuleData(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expectedData := &ModuleResponse{
-		Version:     "0.0.8",
-		PublishedAt: time.Date(2021, time.August, 5, 0, 26, 33, 501756000, time.UTC),
-		Root: ModuleRoot{
-			Inputs: []Input{
-				{
-					Name:        "autoscale",
-					Type:        "string",
-					Description: "Enable autoscaling of elasticsearch",
-					Default:     "\"true\"",
-					Required:    false,
-				},
-				{
-					Name:        "ec_stack_version",
-					Type:        "string",
-					Description: "Version of Elastic Cloud stack to deploy",
-					Default:     "\"\"",
-					Required:    false,
-				},
-				{
-					Name:        "name",
-					Type:        "string",
-					Description: "Name of resources",
-					Default:     "\"ecproject\"",
-					Required:    false,
-				},
-				{
-					Name:        "traffic_filter_sourceip",
-					Type:        "string",
-					Description: "traffic filter source IP",
-					Default:     "\"\"",
-					Required:    false,
-				},
-				{
-					Name:        "ec_region",
-					Type:        "string",
-					Description: "cloud provider region",
-					Default:     "\"gcp-us-west1\"",
-					Required:    false,
-				},
-				{
-					Name:        "deployment_templateid",
-					Type:        "string",
-					Description: "ID of Elastic Cloud deployment type",
-					Default:     "\"gcp-io-optimized\"",
-					Required:    false,
-				},
+
+	expectedData := &ModuleDetails{
+		ID:        "v0.8.1",
+		Published: time.Date(2024, time.August, 5, 17, 16, 42, 0, time.FixedZone("", 3600)),
+		Readme:    true,
+		Inputs: map[string]Variable{
+			"architecture_name": {
+				Type:        "string",
+				Description: "The name of the architecture to create. This needs to be*.alz_architecture_definition.[json|yaml|yml] files.\n",
+				Required:    true,
 			},
-			Outputs: []Output{
-				{
-					Name:        "elasticsearch_password",
-					Description: "elasticsearch password",
-				},
-				{
-					Name:        "deployment_id",
-					Description: "Elastic Cloud deployment ID",
-				},
-				{
-					Name:        "elasticsearch_version",
-					Description: "Stack version deployed",
-				},
-				{
-					Name:        "elasticsearch_cloud_id",
-					Description: "Elastic Cloud project deployment ID",
-				},
-				{
-					Name:        "elasticsearch_https_endpoint",
-					Description: "elasticsearch https endpoint",
-				},
-				{
-					Name:        "elasticsearch_username",
-					Description: "elasticsearch username",
+			"location": {
+				Type:        "string",
+				Description: "The default location for resources in this management group. Used for policy managed identities.\n",
+				Required:    true,
+			},
+		},
+		Outputs: map[string]Output{
+			"management_group_resource_ids": {
+				Description: "A map of management group names to their resource ids.",
+				Sensitive:   false,
+			},
+			"policy_assignment_resource_ids": {
+				Description: "A map of policy assignment names to their resource ids.",
+				Sensitive:   false,
+			},
+		},
+		Providers: []ProviderDependency{},
+		Dependencies: []ModuleDependency{
+			{
+				Name:              "policy_assignment",
+				VersionConstraint: "",
+				Source:            "./modules/azapi_helper",
+			},
+			{
+				Name:              "policy_definitions",
+				VersionConstraint: "",
+				Source:            "./modules/azapi_helper",
+			},
+		},
+		Resources: []Resource{
+			{
+				Address: "modtm_telemetry.telemetry",
+				Type:    "modtm_telemetry",
+				Name:    "telemetry",
+			},
+			{
+				Address: "random_uuid.telemetry",
+				Type:    "random_uuid",
+				Name:    "telemetry",
+			},
+		},
+		Submodules: map[string]Submodule{
+			"azapi_helper": {
+				ModuleDetails: ModuleDetails{
+					Readme: true,
+					Inputs: map[string]Variable{
+						"body": {
+							Type:        "dynamic",
+							Description: "The body object of the resource.",
+							Required:    true,
+						},
+						"name": {
+							Type:        "string",
+							Description: "The name of resource.",
+							Required:    true,
+						},
+					},
+					Outputs: map[string]Output{
+						"identity": {
+							Description: "The identity configuration of the resource.",
+							Sensitive:   false,
+						},
+						"name": {
+							Description: "The name of the resource.",
+							Sensitive:   false,
+						},
+					},
+					Providers:    []ProviderDependency{},
+					Dependencies: []ModuleDependency{},
+					Resources: []Resource{
+						{
+							Address: "azapi_resource.this",
+							Type:    "azapi_resource",
+							Name:    "this",
+						},
+						{
+							Address: "terraform_data.replace_trigger",
+							Type:    "terraform_data",
+							Name:    "replace_trigger",
+						},
+					},
 				},
 			},
 		},
 	}
+
 	if diff := cmp.Diff(expectedData, data); diff != "" {
 		t.Fatalf("mismatched data: %s", diff)
 	}
@@ -129,16 +151,16 @@ func TestGetModuleData(t *testing.T) {
 
 func TestGetMatchingModuleVersion(t *testing.T) {
 	ctx := context.Background()
-	addr, err := tfaddr.ParseModuleSource("puppetlabs/deployment/ec")
+	addr, err := tfaddr.ParseModuleSource("azure/alz/azurerm")
 	if err != nil {
 		t.Fatal(err)
 	}
-	cons := version.MustConstraints(version.NewConstraint(">=0.0.7"))
+	cons := version.MustConstraints(version.NewConstraint(">=0.7.0"))
 	client := NewClient()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI == "/v1/modules/puppetlabs/deployment/ec/versions" {
-			w.Write([]byte(moduleVersionsMockResponse))
+		if r.RequestURI == "/modules/azure/alz/azurerm/index.json" {
+			w.Write([]byte(moduleDataMockResponse))
 			return
 		}
 		http.Error(w, fmt.Sprintf("unexpected request: %q", r.RequestURI), 400)
@@ -151,9 +173,54 @@ func TestGetMatchingModuleVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedVersion := version.Must(version.NewVersion("0.0.8"))
+	expectedVersion := version.Must(version.NewVersion("v0.8.1"))
 	if !expectedVersion.Equal(v) {
 		t.Fatalf("expected version: %s, given: %s", expectedVersion, v)
+	}
+}
+
+func TestGetModuleVersions(t *testing.T) {
+	ctx := context.Background()
+	addr, err := tfaddr.ParseModuleSource("azure/alz/azurerm")
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := NewClient()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.RequestURI == "/modules/azure/alz/azurerm/index.json" {
+			w.Write([]byte(moduleDataMockResponse))
+			return
+		}
+		http.Error(w, fmt.Sprintf("unexpected request: %q", r.RequestURI), 400)
+	}))
+	client.BaseURL = srv.URL
+	t.Cleanup(srv.Close)
+
+	versions, err := client.GetModuleVersions(ctx, addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedVersions := version.Collection{
+		version.Must(version.NewVersion("0.8.1")),
+		version.Must(version.NewVersion("0.8.0")),
+		version.Must(version.NewVersion("0.7.0")),
+		version.Must(version.NewVersion("0.6.0")),
+		version.Must(version.NewVersion("0.5.0")),
+		version.Must(version.NewVersion("0.4.1")),
+		version.Must(version.NewVersion("0.4.0")),
+		version.Must(version.NewVersion("0.3.3")),
+		version.Must(version.NewVersion("0.3.2")),
+		version.Must(version.NewVersion("0.3.1")),
+		version.Must(version.NewVersion("0.3.0")),
+		version.Must(version.NewVersion("0.2.0")),
+		version.Must(version.NewVersion("0.1.1")),
+		version.Must(version.NewVersion("0.1.0")),
+	}
+
+	if diff := cmp.Diff(expectedVersions, versions); diff != "" {
+		t.Fatalf("mismatched versions: %s", diff)
 	}
 }
 
@@ -162,17 +229,17 @@ func TestCancellationThroughContext(t *testing.T) {
 	ctx, cancelFunc := context.WithTimeout(ctx, 50*time.Millisecond)
 	t.Cleanup(cancelFunc)
 
-	addr, err := tfaddr.ParseModuleSource("puppetlabs/deployment/ec")
+	addr, err := tfaddr.ParseModuleSource("azure/alz/azurerm")
 	if err != nil {
 		t.Fatal(err)
 	}
-	cons := version.MustConstraints(version.NewConstraint(">=0.0.7"))
+	cons := version.MustConstraints(version.NewConstraint(">=0.7.0"))
 	client := NewClient()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(500 * time.Millisecond)
-		if r.RequestURI == "/v1/modules/puppetlabs/deployment/ec/versions" {
-			w.Write([]byte(moduleVersionsMockResponse))
+		time.Sleep(500 * time.Millisecond) // Delay longer than the context timeout
+		if r.RequestURI == "/modules/azure/alz/azurerm/index.json" {
+			w.Write([]byte(moduleDataMockResponse))
 			return
 		}
 		http.Error(w, fmt.Sprintf("unexpected request: %q", r.RequestURI), 400)
@@ -181,12 +248,28 @@ func TestCancellationThroughContext(t *testing.T) {
 	t.Cleanup(srv.Close)
 
 	_, err = client.GetMatchingModuleVersion(ctx, addr, cons)
-	e, ok := err.(*url.Error)
-	if !ok {
-		t.Fatalf("expected error, got %#v", err)
+	if err == nil {
+		t.Fatal("expected error due to context cancellation, got nil")
 	}
 
-	if e.Err != context.DeadlineExceeded {
-		t.Fatalf("expected error: %#v, given: %#v", context.DeadlineExceeded, e.Err)
+	urlErr, ok := err.(*url.Error)
+	if !ok {
+		t.Fatalf("expected *url.Error, got: %T", err)
+	}
+
+	if urlErr.Err != context.DeadlineExceeded {
+		t.Fatalf("expected context.DeadlineExceeded error, got: %v", urlErr.Err)
+	}
+}
+
+func TestClientError(t *testing.T) {
+	err := ClientError{
+		StatusCode: 404,
+		Body:       "Not Found",
+	}
+
+	expected := "404: Not Found"
+	if err.Error() != expected {
+		t.Fatalf("expected error message: %s, got: %s", expected, err.Error())
 	}
 }

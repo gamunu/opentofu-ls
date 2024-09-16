@@ -23,23 +23,29 @@ import (
 )
 
 var moduleVersionsMockResponse = `{
-	"modules": [
-	  {
-		"source": "terraform-aws-modules/vpc/aws",
-		"versions": [
-		  {
-			"version": "0.0.1"
-		  },
-		  {
-			"version": "2.0.24"
-		  },
-		  {
-			"version": "1.33.7"
-		  }
-		]
-	  }
-	]
-  }`
+  "addr": {
+    "display": "azure/aks/azurerm",
+    "namespace": "azure",
+    "name": "aks",
+    "target": "azurerm"
+  },
+  "description": "Terraform Module for deploying an AKS cluster",
+  "versions": [
+    {
+      "id": "v9.1.0",
+      "published": "2024-07-04T07:12:29+01:00"
+    },
+    {
+      "id": "v9.0.0",
+      "published": "2024-06-07T02:31:28+01:00"
+    },
+    {
+      "id": "v8.0.0",
+      "published": "2024-03-05T07:33:07Z"
+    }
+  ],
+  "is_blocked": false
+}`
 
 func TestHooks_RegistryModuleVersions(t *testing.T) {
 	ctx := context.Background()
@@ -67,7 +73,7 @@ func TestHooks_RegistryModuleVersions(t *testing.T) {
 
 	regClient := registry.NewClient()
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI == "/v1/modules/terraform-aws-modules/vpc/aws/versions" {
+		if r.RequestURI == "/modules/azure/aks/azurerm/index.json" {
 			w.Write([]byte(moduleVersionsMockResponse))
 			return
 		}
@@ -90,7 +96,7 @@ func TestHooks_RegistryModuleVersions(t *testing.T) {
 		ModuleCalls: map[string]tfmod.DeclaredModuleCall{
 			"vpc": {
 				LocalName:  "vpc",
-				SourceAddr: tfaddr.MustParseModuleSource("registry.terraform.io/terraform-aws-modules/vpc/aws"),
+				SourceAddr: tfaddr.MustParseModuleSource("registry.opentofu.org/azure/aks/azurerm"),
 				RangePtr: &hcl.Range{
 					Filename: "main.tf",
 					Start:    hcl.Pos{Line: 1, Column: 1, Byte: 1},
@@ -106,26 +112,27 @@ func TestHooks_RegistryModuleVersions(t *testing.T) {
 
 	expectedCandidates := []decoder.Candidate{
 		{
-			Label:         `"2.0.24"`,
+			Label:         `"9.1.0"`,
 			Kind:          lang.StringCandidateKind,
-			RawInsertText: `"2.0.24"`,
+			RawInsertText: `"9.1.0"`,
 			SortText:      "  0",
 		},
 		{
-			Label:         `"1.33.7"`,
+			Label:         `"9.0.0"`,
 			Kind:          lang.StringCandidateKind,
-			RawInsertText: `"1.33.7"`,
+			RawInsertText: `"9.0.0"`,
 			SortText:      "  1",
 		},
 		{
-			Label:         `"0.0.1"`,
+			Label:         `"8.0.0"`,
 			Kind:          lang.StringCandidateKind,
-			RawInsertText: `"0.0.1"`,
+			RawInsertText: `"8.0.0"`,
 			SortText:      "  2",
 		},
 	}
 
 	candidates, _ := h.RegistryModuleVersions(ctx, cty.StringVal(""))
+	fmt.Print(candidates)
 	if diff := cmp.Diff(expectedCandidates, candidates); diff != "" {
 		t.Fatalf("mismatched candidates: %s", diff)
 	}

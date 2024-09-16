@@ -45,46 +45,16 @@ type ModuleVersionDescriptor struct {
 	Published time.Time `json:"published"`
 }
 
-type ModuleVersion struct {
-	ID          string    `json:"id"`
-	Published   time.Time `json:"published"`
-	Description string    `json:"description"`
-	Downloads   int       `json:"downloads"`
-	Version     string    `json:"version"`
-}
-
 type ModuleDetails struct {
-	BaseDetails
-	Dependencies []ModuleDependency   `json:"dependencies"`
+	ID           string               `json:"id"`
+	Published    time.Time            `json:"published"`
+	Readme       bool                 `json:"readme"`
+	Inputs       map[string]Variable  `json:"variables"`
+	Outputs      map[string]Output    `json:"outputs"`
 	Providers    []ProviderDependency `json:"providers"`
+	Dependencies []ModuleDependency   `json:"dependencies"`
+	Submodules   map[string]Submodule `json:"submodules"`
 	Resources    []Resource           `json:"resources"`
-}
-
-type BaseDetails struct {
-	Readme      bool                `json:"readme"`
-	Variables   map[string]Variable `json:"variables"`
-	Outputs     map[string]Output   `json:"outputs"`
-	SchemaError string              `json:"schema_error"`
-	EditLink    string              `json:"edit_link"`
-}
-
-type ModuleDependency struct {
-	Name              string `json:"name"`
-	VersionConstraint string `json:"version_constraint"`
-	Source            string `json:"source"`
-}
-
-type ProviderDependency struct {
-	Alias             string `json:"alias"`
-	Name              string `json:"name"`
-	FullName          string `json:"full_name"`
-	VersionConstraint string `json:"version_constraint"`
-}
-
-type Resource struct {
-	Address string `json:"address"`
-	Type    string `json:"type"`
-	Name    string `json:"name"`
 }
 
 type Variable struct {
@@ -100,13 +70,49 @@ type Output struct {
 	Sensitive   bool   `json:"sensitive"`
 }
 
+type ProviderDependency struct {
+	Name              string `json:"name"`
+	FullName          string `json:"full_name"`
+	VersionConstraint string `json:"version_constraint"`
+}
+
+type ModuleDependency struct {
+	Name              string `json:"name"`
+	VersionConstraint string `json:"version_constraint"`
+	Source            string `json:"source"`
+}
+
+type Resource struct {
+	Address string `json:"address"`
+	Type    string `json:"type"`
+	Name    string `json:"name"`
+}
+
+type Submodule struct {
+	ModuleDetails
+}
+
+type Example struct {
+	ModuleDetails
+}
+
+type License struct {
+	SPDX         string  `json:"spdx"`
+	Confidence   float64 `json:"confidence"`
+	IsCompatible bool    `json:"is_compatible"`
+	File         string  `json:"file"`
+	Link         string  `json:"link"`
+}
+
+type LicenseList []License
+
 func (c Client) GetModuleData(ctx context.Context, addr tfaddr.Module, cons version.Constraints) (*ModuleDetails, error) {
 	v, err := c.GetMatchingModuleVersion(ctx, addr, cons)
 	if err != nil {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/modules/%s/%s/%s/%s/index.json",
+	url := fmt.Sprintf("%s/modules/%s/%s/%s/v%s/index.json",
 		c.BaseURL,
 		addr.Package.Namespace,
 		addr.Package.Name,
